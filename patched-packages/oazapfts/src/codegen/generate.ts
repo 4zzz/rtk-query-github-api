@@ -439,15 +439,23 @@ export default class ApiGenerator {
         type: this.getTypeFromSchema(schema),
       });
     });
+    let indexSig: ts.TypeElement | null = null;
     if (additionalProperties) {
       const type =
         additionalProperties === true
           ? cg.keywordType.any
           : this.getTypeFromSchema(additionalProperties);
 
-      members.push(cg.createIndexSignature(type));
+      //members.push(cg.createIndexSignature(type));
+      indexSig = cg.createIndexSignature(type);
     }
-    return factory.createTypeLiteralNode(members);
+
+    if (indexSig === null) {
+      return factory.createTypeLiteralNode(members)
+    } else {
+      const m1: ts.TypeNode[] = [factory.createTypeLiteralNode(members), factory.createTypeLiteralNode([indexSig])]
+      return factory.createIntersectionTypeNode(m1);
+    }
   }
 
   getTypeFromResponses(responses: OpenAPIV3.ResponsesObject) {
