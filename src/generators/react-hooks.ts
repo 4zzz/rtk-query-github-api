@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { getOperationName } from '../../patched-packages/oazapfts/lib/codegen/generate';
+//import { getOperationName } from '../../patched-packages/oazapfts/lib/codegen/generate';
 import { capitalize, isQuery } from '../utils';
 import type { OperationDefinition, EndpointOverrides } from '../types';
 import { getOverrides } from '../generate';
@@ -9,6 +9,19 @@ type GetReactHookNameParams = {
   operationDefinition: OperationDefinition;
   endpointOverrides: EndpointOverrides[] | undefined;
 };
+
+function getOperationName(verb: string, path: string, operationId: string) {
+  //return _getOperationName(verb, path, operation.operationId);
+  const n = operationId!.split('/');
+  if (!n) throw new Error();
+  if (n.length !== 2) throw new Error();
+  const camelize = (prev: string, curr: string) => prev + capitalize(curr);
+  const pre = n[0].split('-').reduce(camelize);
+  const name = n[1].split('-').reduce(camelize);
+
+  const res = pre + capitalize(name);
+  return res;
+}
 
 const getReactHookName = ({
   operationDefinition: { verb, path, operation },
@@ -21,7 +34,7 @@ const getReactHookName = ({
     undefined,
     undefined,
     factory.createIdentifier(
-      `use${capitalize(getOperationName(verb, path, operation.operationId))}${
+      `use${capitalize(getOperationName(verb, path, operation.operationId!))}${
         isQuery(verb, overrides) ? 'Query' : 'Mutation'
       }`
     ),
