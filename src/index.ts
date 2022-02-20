@@ -11,10 +11,16 @@ export async function generateEndpoints(options: GenerationOptions): Promise<str
     ? options.schemaFile
     : path.resolve(process.cwd(), schemaLocation);
 
+  /*
   const sourceCode = await enforceOazapftsTsVersion(() => {
     const { generateApi } = require('./generate');
     return generateApi(schemaAbsPath, options);
   });
+  */
+
+  const { generateApi } = require('./generate');
+  const sourceCode = await generateApi(schemaAbsPath, options);
+
   const outputFile = options.outputFile;
   if (outputFile) {
     fs.writeFileSync(path.resolve(process.cwd(), outputFile), await prettify(outputFile, sourceCode));
