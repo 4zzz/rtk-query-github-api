@@ -29,7 +29,16 @@ function defaultIsDataResponse(code: string) {
 }
 
 function getOperationName({ verb, path, operation }: Pick<OperationDefinition, 'verb' | 'path' | 'operation'>) {
-  return _getOperationName(verb, path, operation.operationId);
+  //return _getOperationName(verb, path, operation.operationId);
+  const n = operation.operationId!.split('/');
+  if (!n) throw new Error();
+  if (n.length !== 2) throw new Error();
+  const camelize = (prev: string, curr: string) => prev + capitalize(curr);
+  const pre = n[0].split('-').reduce(camelize);
+  const name = n[1].split('-').reduce(camelize);
+
+  const res = pre + capitalize(name);
+  return res;
 }
 
 function patternMatches(pattern?: TextMatcher) {
