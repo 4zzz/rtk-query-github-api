@@ -29,7 +29,7 @@ function resolveExternal (parser, options) {
 
   try {
     // console.log('Resolving $ref pointers in %s', parser.$refs._root$Ref.path);
-    let promises = crawl(parser.schema, parser.$refs._root$Ref.path + "#", parser.$refs, options);
+    let promises = crawl(parser.schema, parser.$refs._root$Ref.path + "#", "#", parser.$refs, options);
     return Promise.all(promises);
   }
   catch (e) {
@@ -52,11 +52,13 @@ function resolveExternal (parser, options) {
  * If any of the JSON references point to files that contain additional JSON references,
  * then the corresponding promise will internally reference an array of promises.
  */
-function crawl (obj, path, $refs, options, seen) {
+function crawl (obj, path, pathFromRoot, $refs, options, seen) {
   seen = seen || new Set();
   let promises = [];
 
-  if (obj && typeof obj === "object" && !ArrayBuffer.isView(obj) && !seen.has(obj)) {
+  let isExcludedPath = options.dereference.excludedPathMatcher;
+
+  if (obj && typeof obj === "object" && !ArrayBuffer.isView(obj) && !seen.has(obj) && !isExcludedPath(pathFromRoot)) {
     seen.add(obj); // Track previously seen objects to avoid infinite recursion
     if ($Ref.isExternal$Ref(obj)) {
       promises.push(resolve$Ref(obj, path, $refs, options));
@@ -64,13 +66,17 @@ function crawl (obj, path, $refs, options, seen) {
     else {
       for (let key of Object.keys(obj)) {
         let keyPath = Pointer.join(path, key);
+        let keyPathFromRoot = Pointer.join(pathFromRoot, key);
+
+          if (isExcludedPath(keyPathFromRoot)) continue;
+
         let value = obj[key];
 
         if ($Ref.isExternal$Ref(value)) {
           promises.push(resolve$Ref(value, keyPath, $refs, options));
         }
         else {
-          promises = promises.concat(crawl(value, keyPath, $refs, options, seen));
+          promises = promises.concat(crawl(value, keyPath, keyPathFromRoot, $refs, options, seen));
         }
       }
     }

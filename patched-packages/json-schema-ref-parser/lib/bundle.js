@@ -16,7 +16,6 @@ module.exports = bundle;
  */
 function bundle (parser, options) {
   // console.log('Bundling $ref pointers in %s', parser.$refs._root$Ref.path);
-
   // Build an inventory of all $ref pointers in the JSON Schema
   let inventory = [];
   crawl(parser, "schema", parser.$refs._root$Ref.path + "#", "#", 0, inventory, parser.$refs, options);
@@ -39,7 +38,9 @@ function bundle (parser, options) {
 function crawl (parent, key, path, pathFromRoot, indirections, inventory, $refs, options) {
   let obj = key === null ? parent : parent[key];
 
-  if (obj && typeof obj === "object" && !ArrayBuffer.isView(obj)) {
+  let isExcludedPath = options.dereference.excludedPathMatcher;
+
+  if (obj && typeof obj === "object" && !ArrayBuffer.isView(obj) && !isExcludedPath(pathFromRoot)) {
     if ($Ref.isAllowed$Ref(obj)) {
       inventory$Ref(parent, key, path, pathFromRoot, indirections, inventory, $refs, options);
     }
@@ -68,6 +69,9 @@ function crawl (parent, key, path, pathFromRoot, indirections, inventory, $refs,
       for (let key of keys) {
         let keyPath = Pointer.join(path, key);
         let keyPathFromRoot = Pointer.join(pathFromRoot, key);
+
+        if (isExcludedPath(keyPathFromRoot)) continue;
+
         let value = obj[key];
 
         if ($Ref.isAllowed$Ref(value)) {
