@@ -1,4 +1,4 @@
-import SwaggerParser from '../../patched-packages/swagger-parser';
+import SwaggerParser from '../../../swagger-parser';
 // @ts-ignore
 import converter from 'swagger2openapi';
 
