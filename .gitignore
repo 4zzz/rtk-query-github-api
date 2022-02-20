@@ -1,3 +1,4 @@
 patched-packages/*/node_modules/*
 patched-packages/*/lib/*
 node_modules/*
+src/endpoints/*

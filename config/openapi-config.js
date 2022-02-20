@@ -1,54 +1,53 @@
 'use strict';
 
 const pathsTopLevel = [
-  'app',
-  'applications',
-  'appManifests',
+  'actions',
+  'activity',
   'apps',
-  'authorizations',
+  'billing',
+  'codeScanning',
   'codesOfConduct',
+  'codespaces',
+  'dependabot',
   'emojis',
-  'enterprises',
-  'events',
-  'feeds',
+  'enterpriseAdmin',
   'gists',
+  'git',
   'gitignore',
-  'installation',
+  'checks',
+  'interactions',
   'issues',
   'licenses',
   'markdown',
-  'marketplaceListing',
   'meta',
-  'networks',
-  'notifications',
-  'octocat',
-  'organizations',
+  'migrations',
+  'oauthAuthorizations',
   'orgs',
+  'packages',
   'projects',
+  'pulls',
   'rateLimit',
+  'reactions',
   'repos',
-  'repositories',
   'scim',
   'search',
+  'secretScanning',
   'teams',
-  'user',
   'users',
-  'zen',
 ];
 
 let outputFiles = {};
 pathsTopLevel.forEach((name) => {
-  const upper = name.charAt(0).toUpperCase() + name.slice(1);
-  const key = `../output/${name}Endpoints.ts`;
+  const key = `../src/endpoints/${name}.ts`;
   const value = {
-    filterEndpoints: new RegExp(`^[a-z]+${upper}`),
+    filterEndpoints: new RegExp(`^${name}`),
   };
   outputFiles[key] = value;
 });
 
 const config = {
   schemaFile: 'api.github.com.json',
-  apiFile: 'baseApi.ts',
+  apiFile: '../src/baseApi.ts',
   apiImport: 'githubApi',
   outputFiles,
   exportName: 'githubApi',
