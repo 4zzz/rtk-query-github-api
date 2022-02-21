@@ -11,7 +11,7 @@
   },
   "scripts": {
     "postinstall": "subpkg install",
-    "build": "subpkg run build",
+    "build": "subpkg run build && npm run generate-api",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-api": "patched-packages/codegen-openapi/lib/bin/cli.js config/openapi-config.js"
   },
