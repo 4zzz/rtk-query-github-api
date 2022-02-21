@@ -451,10 +451,12 @@ export default class ApiGenerator {
     }
 
     if (indexSig === null) {
-      return factory.createTypeLiteralNode(members)
-    } else {
+      return factory.createTypeLiteralNode(members);
+    } else if (members.length !== 0) {
       const m1: ts.TypeNode[] = [factory.createTypeLiteralNode(members), factory.createTypeLiteralNode([indexSig])]
       return factory.createIntersectionTypeNode(m1);
+    } else {
+      return factory.createTypeLiteralNode([indexSig]);
     }
   }
 
